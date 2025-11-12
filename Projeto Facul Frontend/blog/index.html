@@ -41,14 +41,20 @@
     <footer class="site-footer">
         </footer>
     
-    <script>
+ <script>
     const postsContainer = document.getElementById('posts-container');
-    const apiUrl = 'https://tomasa-pyrogallic-tiesha.ngrok-free.dev';
+    
+    // ===================================================================
+    // 1. DEFINA O ENDEREÇO DO SEU BACKEND AQUI
+    // ===================================================================
+    const BACKEND_URL = 'https://tomasa-pyrogallic-tiesha.ngrok-free.dev';
+    
+    const apiUrl = `${BACKEND_URL}/api/posts?populate=*&sort=createdAt:desc`;
 
     // Converte os blocos de conteúdo do Strapi num texto simples
     function convertContentToText(contentBlocks) {
         if (!Array.isArray(contentBlocks)) return '';
-        return contentBlocks.map(block =>
+        return contentBlocks.map(block => 
             block.children.map(child => child.text).join('')
         ).join(' ');
     }
@@ -64,21 +70,25 @@
             data.data.forEach(post => {
                 const card = document.createElement('div');
                 card.className = 'post-card';
-
-                // --- CORREÇÃO FINAL AQUI ---
-                // Acedemos a 'post' diretamente, sem 'attributes'
-                const imgUrl = post.cover_image?.url;
-                const textContent = convertContentToText(post.content);
+                
+                const attributes = post.attributes; // Presumindo que os seus dados estão em 'attributes'
+                
+                // ===================================================================
+                // 2. CORREÇÃO DO URL DA IMAGEM
+                // ===================================================================
+                const imgUrl = attributes.cover_image?.data?.attributes?.url;
+                
+                const textContent = convertContentToText(attributes.content);
                 const excerpt = textContent.substring(0, 120) + '...';
 
                 card.innerHTML = `
-                    <a href="/blog/${post.slug}" class="post-card-link">
-                        ${imgUrl ? `<img class="post-card-image" src="${imgUrl}" alt="${post.title}">` : ''}
+                    <a href="post.html?slug=${attributes.slug}" class="post-card-link">
+                        ${imgUrl ? `<img class="post-card-image" src="${BACKEND_URL}${imgUrl}" alt="${attributes.title}">` : ''}
                     </a>
                     <div class="post-card-content">
-                        <h3><a href="/blog/${post.slug}">${post.title}</a></h3>
+                        <h3><a href="post.html?slug=${attributes.slug}">${attributes.title}</a></h3>
                         <p>${excerpt}</p>
-                        <a href="/blog/${post.slug}" class="read-more-btn">Leia Mais &rarr;</a>
+                        <a href="post.html?slug=${attributes.slug}" class="read-more-btn">Leia Mais &rarr;</a>
                     </div>
                 `;
                 postsContainer.appendChild(card);
@@ -88,51 +98,7 @@
             console.error('Erro ao processar os posts:', error);
             postsContainer.innerHTML = '<p style="color: red; text-align: center;">Ocorreu um erro ao carregar o conteúdo.</p>';
         });
-
-        // ===================================================
-// Lógica para o header que se esconde ao rolar para baixo
-// ===================================================
-const header = document.querySelector('header');
-const mainContent = document.querySelector('main'); // Seleciona o conteúdo principal
-let lastScrollTop = 0;
-
-// Adiciona o padding inicial se a página carregar com o header visível
-if (window.scrollY <= 100) {
-    mainContent.classList.add('header-visible-padding');
-}
-
-window.addEventListener('scroll', function() {
-    let currentScrollTop = window.scrollY || document.documentElement.scrollTop;
-
-    if (currentScrollTop > lastScrollTop) {
-        // Rolando PARA BAIXO
-        if (currentScrollTop > 100) {
-            header.classList.add('header-hidden');
-            mainContent.classList.remove('header-visible-padding'); // Remove o padding
-        }
-    } else {
-        // Rolando PARA CIMA
-        header.classList.remove('header-hidden');
-        mainContent.classList.add('header-visible-padding'); // Adiciona o padding
-    }
-    lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
-});
-
-        // Lógica para animar títulos ao aparecer na tela
-        // (Seletor original mantido)
-        const animatedTitles = document.querySelectorAll('.service-detail .detail-text h2');
-        const titleObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('start-animation');
-                    titleObserver.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.1 });
-        animatedTitles.forEach(title => {
-            titleObserver.observe(title);
-        });
-
 </script>
 </body>
+
 </html>
