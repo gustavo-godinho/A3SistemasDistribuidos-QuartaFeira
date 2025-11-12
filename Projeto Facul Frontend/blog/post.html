@@ -60,9 +60,13 @@
         </footer>
         <script>
     const postArea = document.getElementById('post-content-area');
-    const pathParts = window.location.pathname.split('/');
-    const postSlug = pathParts[pathParts.length - 1];
-    const apiUrl = ` https://tomasa-pyrogallic-tiesha.ngrok-free.dev`;
+    const params = new URLSearchParams(window.location.search);
+    const postSlug = params.get('slug'); // Lendo o 'slug' da URL
+
+   
+    const BACKEND_URL = 'https://tomasa-pyrogallic-tiesha.ngrok-free.dev';
+    
+    const apiUrl = `${BACKEND_URL}/api/posts?filters[slug][$eq]=${postSlug}&populate=*`;
 
     // Converte os blocos do Strapi em parágrafos HTML
     function convertContentToHtml(contentBlocks) {
@@ -73,7 +77,11 @@
                 const paragraphText = block.children.map(child => child.text).join('');
                 html += `<p>${paragraphText}</p>`;
             }
-            // Adicione mais `if`s aqui para outros tipos, como 'heading', 'list', etc.
+            if (block.type === 'heading') {
+                const headingText = block.children.map(child => child.text).join('');
+                html += `<h${block.level}>${headingText}</h${block.level}>`;
+            }
+            // Adicione mais `if`s aqui para 'list', 'image', etc.
         });
         return html;
     }
@@ -86,18 +94,21 @@
                 return;
             }
 
-            // --- CORREÇÃO FINAL AQUI ---
-            const post = data.data[0];
-
+            const post = data.data[0].attributes; // Presumindo que os dados estão em 'attributes'
+            
             document.title = post.seo_title || post.title + " - Blog EDGETI";
             // ... (código da meta description) ...
-
-            const imgUrl = post.cover_image?.url;
+            
+            // ===================================================================
+            // 2. CORREÇÃO DO URL DA IMAGEM
+            // ===================================================================
+            const imgUrl = post.cover_image?.data?.attributes?.url;
+            
             const contentHtml = convertContentToHtml(post.content);
 
             postArea.innerHTML = `
                 <h1>${post.title}</h1>
-                ${imgUrl ? `<img class="post-main-image" src="${imgUrl}" alt="${post.title}">` : ''}
+                ${imgUrl ? `<img class="post-main-image" src="${BACKEND_URL}${imgUrl}" alt="${post.title}">` : ''}
                 <div class="post-body">
                     ${contentHtml}
                 </div>
@@ -107,50 +118,7 @@
             console.error('Erro ao processar o post:', error);
             postArea.innerHTML = '<h1 style="color: red; text-align: center;">Ocorreu um erro ao carregar este post.</h1>';
         });
-
-        // ===================================================
-// Lógica para o header que se esconde ao rolar para baixo
-// ===================================================
-const header = document.querySelector('header');
-const mainContent = document.querySelector('main'); // Seleciona o conteúdo principal
-let lastScrollTop = 0;
-
-// Adiciona o padding inicial se a página carregar com o header visível
-if (window.scrollY <= 100) {
-    mainContent.classList.add('header-visible-padding');
-}
-
-window.addEventListener('scroll', function() {
-    let currentScrollTop = window.scrollY || document.documentElement.scrollTop;
-
-    if (currentScrollTop > lastScrollTop) {
-        // Rolando PARA BAIXO
-        if (currentScrollTop > 100) {
-            header.classList.add('header-hidden');
-            mainContent.classList.remove('header-visible-padding'); // Remove o padding
-        }
-    } else {
-        // Rolando PARA CIMA
-        header.classList.remove('header-hidden');
-        mainContent.classList.add('header-visible-padding'); // Adiciona o padding
-    }
-    lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
-});
-
-        // Lógica para animar títulos ao aparecer na tela
-        const animatedTitles = document.querySelectorAll('.service-detail .detail-text h2');
-        const titleObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('start-animation');
-                    titleObserver.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.1 });
-        animatedTitles.forEach(title => {
-            titleObserver.observe(title);
-        });
-
 </script>
 </body>
 </html>
+
