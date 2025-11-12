@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Unisulistas | Notícias e Eventos</title>
+    <link rel="stylesheet" href="../style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <img id="logo" src="../Logos_Unisulistas/LOGO.png" alt="Logo Unisulistas">
+            <nav>
+                <ul>
+                    <li><a href="/#home">Início</a></li>
+                    <li><a href="/#services">Cursos</a></li> 
+                    <li><a href="/blog/">Blog</a></li>
+                    <li><a href="/#contact">Contato</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="blog-list-section">
+            <div class="container">
+                <h2>Blog da Unisulistas</h2>
+                <p class="section-subtitle">Fique por dentro das últimas notícias, eventos e novidades da vida acadêmica.</p>
+
+                <div id="posts-container" class="posts-grid">
+                    </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        </footer>
+    
+    <script>
+    const postsContainer = document.getElementById('posts-container');
+    const apiUrl = 'https://tomasa-pyrogallic-tiesha.ngrok-free.dev';
+
+    // Converte os blocos de conteúdo do Strapi num texto simples
+    function convertContentToText(contentBlocks) {
+        if (!Array.isArray(contentBlocks)) return '';
+        return contentBlocks.map(block =>
+            block.children.map(child => child.text).join('')
+        ).join(' ');
+    }
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            if (!data.data || data.data.length === 0) {
+                postsContainer.innerHTML = '<p style="color: white; text-align: center;">Nenhum post encontrado no momento. Volte em breve!</p>';
+                return;
+            }
+
+            data.data.forEach(post => {
+                const card = document.createElement('div');
+                card.className = 'post-card';
+
+                // --- CORREÇÃO FINAL AQUI ---
+                // Acedemos a 'post' diretamente, sem 'attributes'
+                const imgUrl = post.cover_image?.url;
+                const textContent = convertContentToText(post.content);
+                const excerpt = textContent.substring(0, 120) + '...';
+
+                card.innerHTML = `
+                    <a href="/blog/${post.slug}" class="post-card-link">
+                        ${imgUrl ? `<img class="post-card-image" src="${imgUrl}" alt="${post.title}">` : ''}
+                    </a>
+                    <div class="post-card-content">
+                        <h3><a href="/blog/${post.slug}">${post.title}</a></h3>
+                        <p>${excerpt}</p>
+                        <a href="/blog/${post.slug}" class="read-more-btn">Leia Mais &rarr;</a>
+                    </div>
+                `;
+                postsContainer.appendChild(card);
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao processar os posts:', error);
+            postsContainer.innerHTML = '<p style="color: red; text-align: center;">Ocorreu um erro ao carregar o conteúdo.</p>';
+        });
+
+        // ===================================================
+// Lógica para o header que se esconde ao rolar para baixo
+// ===================================================
+const header = document.querySelector('header');
+const mainContent = document.querySelector('main'); // Seleciona o conteúdo principal
+let lastScrollTop = 0;
+
+// Adiciona o padding inicial se a página carregar com o header visível
+if (window.scrollY <= 100) {
+    mainContent.classList.add('header-visible-padding');
+}
+
+window.addEventListener('scroll', function() {
+    let currentScrollTop = window.scrollY || document.documentElement.scrollTop;
+
+    if (currentScrollTop > lastScrollTop) {
+        // Rolando PARA BAIXO
+        if (currentScrollTop > 100) {
+            header.classList.add('header-hidden');
+            mainContent.classList.remove('header-visible-padding'); // Remove o padding
+        }
+    } else {
+        // Rolando PARA CIMA
+        header.classList.remove('header-hidden');
+        mainContent.classList.add('header-visible-padding'); // Adiciona o padding
+    }
+    lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
+});
+
+        // Lógica para animar títulos ao aparecer na tela
+        // (Seletor original mantido)
+        const animatedTitles = document.querySelectorAll('.service-detail .detail-text h2');
+        const titleObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('start-animation');
+                    titleObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        animatedTitles.forEach(title => {
+            titleObserver.observe(title);
+        });
+
+</script>
+</body>
+</html>
