@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Unisulistas | Notícias e Eventos</title>
+    <link rel="stylesheet" href="../style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <img id="logo" src="../Logos_Unisulistas/LOGO.png" alt="Logo Unisulistas">
+            <nav>
+                <ul>
+                    <li><a href="/#home">Início</a></li>
+                    <li><a href="/#services">Cursos</a></li> 
+                    <li><a href="/blog/">Blog</a></li>
+                    <li><a href="/#contact">Contato</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="blog-list-section">
+            <div class="container">
+                <h2>Blog da Unisulistas</h2>
+                <p class="section-subtitle">Fique por dentro das últimas notícias, eventos e novidades da vida acadêmica.</p>
+
+                <div id="posts-container" class="posts-grid">
+                    </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        </footer>
+    
+ <script>
+    const postsContainer = document.getElementById('posts-container');
+    
+    // ===================================================================
+    // 1. DEFINA O ENDEREÇO DO SEU BACKEND AQUI
+    // ===================================================================
+    const BACKEND_URL = 'https://tomasa-pyrogallic-tiesha.ngrok-free.dev';
+    
+    const apiUrl = `${BACKEND_URL}/api/posts?populate=*&sort=createdAt:desc`;
+
+    // Converte os blocos de conteúdo do Strapi num texto simples
+    function convertContentToText(contentBlocks) {
+        if (!Array.isArray(contentBlocks)) return '';
+        return contentBlocks.map(block => 
+            block.children.map(child => child.text).join('')
+        ).join(' ');
+    }
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            if (!data.data || data.data.length === 0) {
+                postsContainer.innerHTML = '<p style="color: white; text-align: center;">Nenhum post encontrado no momento. Volte em breve!</p>';
+                return;
+            }
+
+            data.data.forEach(post => {
+                const card = document.createElement('div');
+                card.className = 'post-card';
+                
+                const attributes = post.attributes; // Presumindo que os seus dados estão em 'attributes'
+                
+                // ===================================================================
+                // 2. CORREÇÃO DO URL DA IMAGEM
+                // ===================================================================
+                const imgUrl = attributes.cover_image?.data?.attributes?.url;
+                
+                const textContent = convertContentToText(attributes.content);
+                const excerpt = textContent.substring(0, 120) + '...';
+
+                card.innerHTML = `
+                    <a href="post.html?slug=${attributes.slug}" class="post-card-link">
+                        ${imgUrl ? `<img class="post-card-image" src="${BACKEND_URL}${imgUrl}" alt="${attributes.title}">` : ''}
+                    </a>
+                    <div class="post-card-content">
+                        <h3><a href="post.html?slug=${attributes.slug}">${attributes.title}</a></h3>
+                        <p>${excerpt}</p>
+                        <a href="post.html?slug=${attributes.slug}" class="read-more-btn">Leia Mais &rarr;</a>
+                    </div>
+                `;
+                postsContainer.appendChild(card);
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao processar os posts:', error);
+            postsContainer.innerHTML = '<p style="color: red; text-align: center;">Ocorreu um erro ao carregar o conteúdo.</p>';
+        });
+</script>
+</body>
+
+</html>
