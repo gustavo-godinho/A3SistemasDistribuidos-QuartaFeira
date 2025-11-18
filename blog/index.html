@@ -59,9 +59,17 @@
     fetch(apiUrl, {
         method: 'GET',
         headers: {
-            "ngrok-skip-browser-warning": "true" // Esse cabeçalho pula a tela de aviso
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true" // O Crachá VIP
         }
     })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Erro HTTP! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
     .then(response => response.json())
     .then(data => {
         if (!data.data || data.data.length === 0) {
@@ -99,4 +107,5 @@
 </body>
 
 </html>
+
 
