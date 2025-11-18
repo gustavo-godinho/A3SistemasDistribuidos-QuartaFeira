@@ -44,14 +44,10 @@
  <script>
     const postsContainer = document.getElementById('posts-container');
     
-    // ===================================================================
-    // 1. DEFINA O ENDEREÇO DO SEU BACKEND AQUI
-    // ===================================================================
-    const BACKEND_URL = 'https://tomasa-pyrogallic-tiesha.ngrok-free.dev';
-    
+    // SEU LINK DO NGROK ATUAL
+    const BACKEND_URL = 'https://tomasa-pyrogallic-tiesha.ngrok-free.dev'; 
     const apiUrl = `${BACKEND_URL}/api/posts?populate=*&sort=createdAt:desc`;
 
-    // Converte os blocos de conteúdo do Strapi num texto simples
     function convertContentToText(contentBlocks) {
         if (!Array.isArray(contentBlocks)) return '';
         return contentBlocks.map(block => 
@@ -59,46 +55,48 @@
         ).join(' ');
     }
 
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            if (!data.data || data.data.length === 0) {
-                postsContainer.innerHTML = '<p style="color: white; text-align: center;">Nenhum post encontrado no momento. Volte em breve!</p>';
-                return;
-            }
+    // --- A MÁGICA ESTÁ AQUI ---
+    fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+            "ngrok-skip-browser-warning": "true" // Esse cabeçalho pula a tela de aviso
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.data || data.data.length === 0) {
+            postsContainer.innerHTML = '<p style="color: white; text-align: center;">Nenhum post encontrado.</p>';
+            return;
+        }
 
-            data.data.forEach(post => {
-                const card = document.createElement('div');
-                card.className = 'post-card';
-                
-                const attributes = post.attributes; // Presumindo que os seus dados estão em 'attributes'
-                
-                // ===================================================================
-                // 2. CORREÇÃO DO URL DA IMAGEM
-                // ===================================================================
-                const imgUrl = attributes.cover_image?.data?.attributes?.url;
-                
-                const textContent = convertContentToText(attributes.content);
-                const excerpt = textContent.substring(0, 120) + '...';
+        data.data.forEach(post => {
+            const card = document.createElement('div');
+            card.className = 'post-card';
+            
+            const attributes = post.attributes;
+            const imgUrl = attributes.cover_image?.data?.attributes?.url;
+            const textContent = convertContentToText(attributes.content);
+            const excerpt = textContent.substring(0, 120) + '...';
 
-                card.innerHTML = `
-                    <a href="post.html?slug=${attributes.slug}" class="post-card-link">
-                        ${imgUrl ? `<img class="post-card-image" src="${BACKEND_URL}${imgUrl}" alt="${attributes.title}">` : ''}
-                    </a>
-                    <div class="post-card-content">
-                        <h3><a href="post.html?slug=${attributes.slug}">${attributes.title}</a></h3>
-                        <p>${excerpt}</p>
-                        <a href="post.html?slug=${attributes.slug}" class="read-more-btn">Leia Mais &rarr;</a>
-                    </div>
-                `;
-                postsContainer.appendChild(card);
-            });
-        })
-        .catch(error => {
-            console.error('Erro ao processar os posts:', error);
-            postsContainer.innerHTML = '<p style="color: red; text-align: center;">Ocorreu um erro ao carregar o conteúdo.</p>';
+            card.innerHTML = `
+                <a href="post.html?slug=${attributes.slug}" class="post-card-link">
+                    ${imgUrl ? `<img class="post-card-image" src="${BACKEND_URL}${imgUrl}" alt="${attributes.title}">` : ''}
+                </a>
+                <div class="post-card-content">
+                    <h3><a href="post.html?slug=${attributes.slug}">${attributes.title}</a></h3>
+                    <p>${excerpt}</p>
+                    <a href="post.html?slug=${attributes.slug}" class="read-more-btn">Leia Mais &rarr;</a>
+                </div>
+            `;
+            postsContainer.appendChild(card);
         });
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        postsContainer.innerHTML = '<p style="color: red; text-align: center;">Erro de conexão com o Ngrok.</p>';
+    });
 </script>
 </body>
 
 </html>
+
