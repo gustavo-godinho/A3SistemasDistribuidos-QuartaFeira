@@ -58,82 +58,72 @@
 
     <footer class="site-footer">
         </footer>
-        <script>
+       <script>
     const postArea = document.getElementById('post-content-area');
     const params = new URLSearchParams(window.location.search);
-    const postSlug = params.get('slug'); // Lendo o 'slug' da URL
+    const postSlug = params.get('slug');
 
-   
+    // LINK ATUAL DO SEU NGROK
     const BACKEND_URL = 'https://tomasa-pyrogallic-tiesha.ngrok-free.dev';
     
     const apiUrl = `${BACKEND_URL}/api/posts?filters[slug][$eq]=${postSlug}&populate=*`;
 
-    // Converte os blocos do Strapi em parágrafos HTML
+    // Função simples para converter o conteúdo (assumindo texto por enquanto)
+    // Se quiser usar o showdown/markdown, descomente a biblioteca no head
     function convertContentToHtml(contentBlocks) {
         if (!Array.isArray(contentBlocks)) return '';
         let html = '';
         contentBlocks.forEach(block => {
             if (block.type === 'paragraph') {
-                const paragraphText = block.children.map(child => child.text).join('');
-                html += `<p>${paragraphText}</p>`;
+                const text = block.children.map(c => c.text).join('');
+                html += `<p>${text}</p>`;
             }
             if (block.type === 'heading') {
-                const headingText = block.children.map(child => child.text).join('');
-                html += `<h${block.level}>${headingText}</h${block.level}>`;
+                const text = block.children.map(c => c.text).join('');
+                html += `<h${block.level}>${text}</h${block.level}>`;
             }
-            // Adicione mais `if`s aqui para 'list', 'image', etc.
+            if (block.type === 'list') {
+                const listItems = block.children.map(item => `<li>${item.children[0].text}</li>`).join('');
+                html += `<ul>${listItems}</ul>`;
+            }
         });
         return html;
     }
 
     fetch(apiUrl, {
-        method: 'GET',
-        headers: {
-            "Content-Type": "application/json",
-            "ngrok-skip-browser-warning": "true" // O Crachá VIP
-        }
+        headers: { "ngrok-skip-browser-warning": "true" }
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`Erro HTTP! status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
     .then(res => res.json())
-        .then(data => {
-            if (!data.data || data.data.length === 0) {
-                postArea.innerHTML = '<h1 style="color: white; text-align: center;">Post não encontrado.</h1>';
-                return;
-            }
+    .then(data => {
+        if (!data.data || data.data.length === 0) {
+            postArea.innerHTML = '<h1 style="color: white; text-align: center;">Post não encontrado.</h1>';
+            return;
+        }
 
-            const post = data.data[0].attributes; // Presumindo que os dados estão em 'attributes'
-            
-            document.title = post.seo_title || post.title + " - Blog EDGETI";
-            // ... (código da meta description) ...
-            
-            // ===================================================================
-            // 2. CORREÇÃO DO URL DA IMAGEM
-            // ===================================================================
-            const imgUrl = post.cover_image?.data?.attributes?.url;
-            
-            const contentHtml = convertContentToHtml(post.content);
+        // --- CORREÇÃO: ACESSO DIRETO (SEM .attributes) ---
+        const post = data.data[0]; 
+        
+        document.title = post.seo_title || post.title + " - Blog Unisulistas";
+        
+        const imgUrl = post.cover_image?.url;
+        const contentHtml = convertContentToHtml(post.content);
 
-            postArea.innerHTML = `
-                <h1>${post.title}</h1>
-                ${imgUrl ? `<img class="post-main-image" src="${BACKEND_URL}${imgUrl}" alt="${post.title}">` : ''}
-                <div class="post-body">
-                    ${contentHtml}
-                </div>
-            `;
-        })
-        .catch(error => {
-            console.error('Erro ao processar o post:', error);
-            postArea.innerHTML = '<h1 style="color: red; text-align: center;">Ocorreu um erro ao carregar este post.</h1>';
-        });
+        postArea.innerHTML = `
+            <h1>${post.title}</h1>
+            ${imgUrl ? `<img class="post-main-image" src="${BACKEND_URL}${imgUrl}" alt="${post.title}">` : ''}
+            <div class="post-body">
+                ${contentHtml}
+            </div>
+        `;
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        postArea.innerHTML = '<h1 style="color: red; text-align: center;">Erro ao carregar.</h1>';
+    });
 </script>
 </body>
 </html>
+
 
 
 
