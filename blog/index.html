@@ -44,8 +44,9 @@
  <script>
     const postsContainer = document.getElementById('posts-container');
     
-    // SEU LINK DO NGROK ATUAL
+    // LINK ATUAL DO SEU NGROK (Confira se é este mesmo que está no terminal)
     const BACKEND_URL = 'https://tomasa-pyrogallic-tiesha.ngrok-free.dev'; 
+    
     const apiUrl = `${BACKEND_URL}/api/posts?populate=*&sort=createdAt:desc`;
 
     function convertContentToText(contentBlocks) {
@@ -55,23 +56,16 @@
         ).join(' ');
     }
 
-    // --- A MÁGICA ESTÁ AQUI ---
     fetch(apiUrl, {
         method: 'GET',
         headers: {
-            "Content-Type": "application/json",
-            "ngrok-skip-browser-warning": "true" // O Crachá VIP
+            "ngrok-skip-browser-warning": "true"
         }
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`Erro HTTP! status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
     .then(response => response.json())
     .then(data => {
+        console.log("Dados recebidos:", data); // Ajuda a debugar no F12
+
         if (!data.data || data.data.length === 0) {
             postsContainer.innerHTML = '<p style="color: white; text-align: center;">Nenhum post encontrado.</p>';
             return;
@@ -81,19 +75,23 @@
             const card = document.createElement('div');
             card.className = 'post-card';
             
-            const attributes = post.attributes;
-            const imgUrl = attributes.cover_image?.data?.attributes?.url;
-            const textContent = convertContentToText(attributes.content);
+            // --- CORREÇÃO: ACESSO DIRETO (SEM .attributes) ---
+            // O Strapi v5 entrega direto: post.title, post.slug, etc.
+            
+            // Tratamento seguro da imagem (caso não tenha imagem)
+            const imgUrl = post.cover_image?.url; 
+            
+            const textContent = convertContentToText(post.content);
             const excerpt = textContent.substring(0, 120) + '...';
 
             card.innerHTML = `
-                <a href="post.html?slug=${attributes.slug}" class="post-card-link">
-                    ${imgUrl ? `<img class="post-card-image" src="${BACKEND_URL}${imgUrl}" alt="${attributes.title}">` : ''}
+                <a href="post.html?slug=${post.slug}" class="post-card-link">
+                    ${imgUrl ? `<img class="post-card-image" src="${BACKEND_URL}${imgUrl}" alt="${post.title}">` : ''}
                 </a>
                 <div class="post-card-content">
-                    <h3><a href="post.html?slug=${attributes.slug}">${attributes.title}</a></h3>
+                    <h3><a href="post.html?slug=${post.slug}">${post.title}</a></h3>
                     <p>${excerpt}</p>
-                    <a href="post.html?slug=${attributes.slug}" class="read-more-btn">Leia Mais &rarr;</a>
+                    <a href="post.html?slug=${post.slug}" class="read-more-btn">Leia Mais &rarr;</a>
                 </div>
             `;
             postsContainer.appendChild(card);
@@ -101,11 +99,12 @@
     })
     .catch(error => {
         console.error('Erro:', error);
-        postsContainer.innerHTML = '<p style="color: red; text-align: center;">Erro de conexão com o Ngrok.</p>';
+        postsContainer.innerHTML = '<p style="color: red; text-align: center;">Erro ao processar dados.</p>';
     });
 </script>
 </body>
 
 </html>
+
 
 
