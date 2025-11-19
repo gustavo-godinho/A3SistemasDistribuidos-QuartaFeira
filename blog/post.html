@@ -90,7 +90,14 @@
     }
 
     // --- AQUI ESTÁ A CORREÇÃO: FETCH SIMPLES (SEM HEADERS) ---
-    fetch(apiUrl)
+    fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json",
+            // Este é o passe livre para o Ngrok
+            "ngrok-skip-browser-warning": "true" 
+        }
+    })
     .then(res => res.json())
     .then(data => {
         if (!data.data || data.data.length === 0) {
@@ -121,6 +128,7 @@
 </script>
 </body>
 </html>
+
 
 
 
