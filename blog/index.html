@@ -58,7 +58,11 @@
 
     fetch(apiUrl, {
         method: 'GET',
-        
+        headers: {
+            "Content-Type": "application/json",
+            // Este é o passe livre para o Ngrok
+            "ngrok-skip-browser-warning": "true" 
+        }
     })
     .then(response => response.json())
     .then(data => {
@@ -103,6 +107,7 @@
 </body>
 
 </html>
+
 
 
 
