@@ -58,18 +58,17 @@
 
     <footer class="site-footer">
         </footer>
-       <script>
+      <script>
     const postArea = document.getElementById('post-content-area');
     const params = new URLSearchParams(window.location.search);
     const postSlug = params.get('slug');
 
-    // LINK ATUAL DO SEU NGROK
+    // LINK ATUAL DO SEU NGROK (Lembre-se de atualizar se reiniciar o ngrok)
     const BACKEND_URL = 'https://tomasa-pyrogallic-tiesha.ngrok-free.dev';
     
     const apiUrl = `${BACKEND_URL}/api/posts?filters[slug][$eq]=${postSlug}&populate=*`;
 
-    // Função simples para converter o conteúdo (assumindo texto por enquanto)
-    // Se quiser usar o showdown/markdown, descomente a biblioteca no head
+    // Função simples para converter o conteúdo
     function convertContentToHtml(contentBlocks) {
         if (!Array.isArray(contentBlocks)) return '';
         let html = '';
@@ -90,9 +89,8 @@
         return html;
     }
 
-    fetch(apiUrl, {
-        headers: { "ngrok-skip-browser-warning": "true" }
-    })
+    // --- AQUI ESTÁ A CORREÇÃO: FETCH SIMPLES (SEM HEADERS) ---
+    fetch(apiUrl)
     .then(res => res.json())
     .then(data => {
         if (!data.data || data.data.length === 0) {
@@ -100,7 +98,7 @@
             return;
         }
 
-        // --- CORREÇÃO: ACESSO DIRETO (SEM .attributes) ---
+        // Acesso direto aos dados (Padrão Strapi v5)
         const post = data.data[0]; 
         
         document.title = post.seo_title || post.title + " - Blog Unisulistas";
@@ -118,11 +116,12 @@
     })
     .catch(error => {
         console.error('Erro:', error);
-        postArea.innerHTML = '<h1 style="color: red; text-align: center;">Erro ao carregar.</h1>';
+        postArea.innerHTML = '<h1 style="color: red; text-align: center;">Erro ao carregar. (Verifique se fez o "Visit Site" na aba do Ngrok)</h1>';
     });
 </script>
 </body>
 </html>
+
 
 
 
