@@ -403,12 +403,12 @@ nav ul li a:hover {
     margin-bottom: 15px;
 }
 .post-card-content h3 a {
-    text-decoration: none;
-    color: var(--text-primary);
+ text-decoration: none !important; /* Remove o sublinhado */
+    color: var(--text-primary) !important; /* Força a cor padrão */
     transition: color 0.3s ease;
 }
 .post-card-content h3 a:hover {
-    color: var(--primary-color);
+  color: var(--primary-color) !important; /* Fica azul no hover */
 }
 .post-card-content p {
     color: var(--text-secondary);
