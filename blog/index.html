@@ -45,7 +45,7 @@
     const postsContainer = document.getElementById('posts-container');
     
     // LINK ATUAL DO SEU NGROK (Confira se é este mesmo que está no terminal)
-    const BACKEND_URL = 'https://tomasa-pyrogallic-tiesha.ngrok-free.dev'; 
+    const BACKEND_URL = ' https://tomasa-pyrogallic-tiesha.ngrok-free.dev'; 
     
     const apiUrl = `${BACKEND_URL}/api/posts?populate=*&sort=createdAt:desc`;
 
@@ -60,7 +60,7 @@
         method: 'GET',
         headers: {
             "Content-Type": "application/json",
-            // Este é o passe livre para o Ngrok
+            //passe livre para o Ngrok
             "ngrok-skip-browser-warning": "true" 
         }
     })
@@ -77,9 +77,7 @@
             const card = document.createElement('div');
             card.className = 'post-card';
             
-            // --- CORREÇÃO: ACESSO DIRETO (SEM .attributes) ---
-            // O Strapi v5 entrega direto: post.title, post.slug, etc.
-            
+          
             // Tratamento seguro da imagem (caso não tenha imagem)
             const imgUrl = post.cover_image?.url; 
             

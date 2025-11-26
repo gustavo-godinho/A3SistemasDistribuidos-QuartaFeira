@@ -64,7 +64,7 @@
     const postSlug = params.get('slug');
 
     // LINK ATUAL DO SEU NGROK (Lembre-se de atualizar se reiniciar o ngrok)
-    const BACKEND_URL = 'https://tomasa-pyrogallic-tiesha.ngrok-free.dev';
+    const BACKEND_URL = ' https://tomasa-pyrogallic-tiesha.ngrok-free.dev';
     
     const apiUrl = `${BACKEND_URL}/api/posts?filters[slug][$eq]=${postSlug}&populate=*`;
 
@@ -89,7 +89,6 @@
         return html;
     }
 
-    // --- AQUI ESTÁ A CORREÇÃO: FETCH SIMPLES (SEM HEADERS) ---
     fetch(apiUrl, {
         method: 'GET',
         headers: {

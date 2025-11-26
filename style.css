@@ -126,7 +126,7 @@ nav ul li a:hover {
     background:
         linear-gradient(to right, rgb(0, 0, 0) 0%, rgba(0, 0, 0, 0.89) 50%, rgba(0, 0, 0, 0.479) 100%),
         linear-gradient(to top, var(--background-dark) 5%, transparent 40%),
-        url('images/redes-pc.jpg') no-repeat center center/cover;
+        url('image/dicas-para-quem-está-indo-para-a-faculdade.jpeg') no-repeat center center/cover;
 }
 
 .hero .container {
