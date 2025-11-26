@@ -813,3 +813,32 @@ main {
         font-size: 2.2rem;
     }
 }
+/* ====================================================== */
+/* ESTILO DO BOTÃO VOLTAR (BLOG)                        */
+/* ====================================================== */
+
+.btn-voltar {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px; /* Espaço entre a seta e o texto */
+    color: var(--text-secondary); /* Cor cinza/branca suave */
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 30px; /* Espaço entre o botão e o título do post */
+    transition: all 0.3s ease;
+}
+
+.btn-voltar i {
+    font-size: 0.9rem;
+    transition: transform 0.3s ease;
+}
+
+/* Efeito ao passar o mouse */
+.btn-voltar:hover {
+    color: var(--primary-color); /* Fica azul */
+}
+
+.btn-voltar:hover i {
+    transform: translateX(-5px); /* A setinha move para a esquerda */
+}
