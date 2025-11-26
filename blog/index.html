@@ -55,48 +55,13 @@
         ).join(' ');
     }
 
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            if (!data.data || data.data.length === 0) {
-                postsContainer.innerHTML = '<p style="color: white; text-align: center;">Nenhum post encontrado.</p>';
-                return;
-            }
-
-            data.data.forEach(post => {
-                const card = document.createElement('div');
-                card.className = 'post-card';
-                
-                const attributes = post;      
-             
-                const relativePath = attributes.cover_image?.url;
-                
-                let imageHTML = '';
-                if (relativePath) {
-                   
-                    imageHTML = `<img class="post-card-image" src="${BACKEND_URL}${relativePath}" alt="${attributes.title}">`;
-                }
-
-                const textContent = convertContentToText(attributes.content);
-                const excerpt = textContent.substring(0, 120) + '...';
-
-                card.innerHTML = `
-                    <a href="post.html?slug=${attributes.slug}" class="post-card-link">
-                        ${imageHTML}
-                    </a>
-                    <div class="post-card-content">
-                        <h3><a href="post.html?slug=${attributes.slug}">${attributes.title}</a></h3>
-                        <p>${excerpt}</p>
-                        <a href="post.html?slug=${attributes.slug}" class="read-more-btn">Leia Mais &rarr;</a>
-                    </div>
-                `;
-                postsContainer.appendChild(card);
-            });
-        })
-        .catch(error => {
-            console.error('Erro:', error);
-            postsContainer.innerHTML = '<p style="color: red; text-align: center;">Erro ao carregar. Verifique se o Ngrok está rodando e se fez o "Visit Site".</p>';
-        });
+    fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true" 
+        }
+    })
 </script>
 </body>
 
