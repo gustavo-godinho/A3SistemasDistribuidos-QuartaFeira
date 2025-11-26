@@ -44,10 +44,12 @@
 <script>
     const postsContainer = document.getElementById('posts-container');
     
-    const BACKEND_URL = 'https://tomasa-pyrogallic-tiesha.ngrok-free.dev'; 
+    // SEU LINK NGROK ATUAL
+    const BACKEND_URL = 'https://tomasa-pyrogallic-tiesha.ngrok-free.dev';
     
     const apiUrl = `${BACKEND_URL}/api/posts?populate=*&sort=createdAt:desc`;
 
+    // Função auxiliar para texto
     function convertContentToText(contentBlocks) {
         if (!Array.isArray(contentBlocks)) return '';
         return contentBlocks.map(block => 
@@ -55,13 +57,66 @@
         ).join(' ');
     }
 
+    console.log("1. Iniciando busca em:", apiUrl);
+
     fetch(apiUrl, {
         method: 'GET',
         headers: {
             "Content-Type": "application/json",
-            "ngrok-skip-browser-warning": "true" 
+            "ngrok-skip-browser-warning": "true"
         }
     })
+    .then(res => {
+        console.log("2. Status da resposta:", res.status);
+        return res.json();
+    })
+    .then(data => {
+        console.log("3. DADOS RECEBIDOS (Abra aqui para ver):", data); // <--- OLHE ISSO NO CONSOLE
+
+        // Verifica se data.data existe e se tem itens
+        if (!data.data || data.data.length === 0) {
+            postsContainer.innerHTML = '<p style="color: white; text-align: center;">A API respondeu, mas a lista de posts está vazia. (Verifique se publicou o post no Strapi)</p>';
+            return;
+        }
+
+        data.data.forEach(post => {
+            const card = document.createElement('div');
+            card.className = 'post-card';
+            
+            // TENTATIVA DE LEITURA HÍBRIDA (Para funcionar em v4 e v5)
+            // Se post.attributes existir (v4), usa ele. Se não, usa o próprio post (v5).
+            const attributes = post.attributes ? post.attributes : post;
+            const id = post.id; // O ID costuma estar na raiz
+            const slug = attributes.slug; // O slug pode estar na raiz ou em attributes
+
+            // Imagem
+            let imgUrl = null;
+            if (attributes.cover_image && attributes.cover_image.url) {
+                imgUrl = attributes.cover_image.url; // v5 direto
+            } else if (attributes.cover_image?.data?.attributes?.url) {
+                imgUrl = attributes.cover_image.data.attributes.url; // v4
+            }
+
+            const textContent = convertContentToText(attributes.content);
+            const excerpt = textContent.substring(0, 120) + '...';
+
+            card.innerHTML = `
+                <a href="post.html?slug=${slug}" class="post-card-link">
+                    ${imgUrl ? `<img class="post-card-image" src="${BACKEND_URL}${imgUrl}" alt="${attributes.title}">` : ''}
+                </a>
+                <div class="post-card-content">
+                    <h3><a href="post.html?slug=${slug}">${attributes.title}</a></h3>
+                    <p>${excerpt}</p>
+                    <a href="post.html?slug=${slug}" class="read-more-btn">Leia Mais &rarr;</a>
+                </div>
+            `;
+            postsContainer.appendChild(card);
+        });
+    })
+    .catch(error => {
+        console.error('ERRO FATAL:', error);
+        postsContainer.innerHTML = `<p style="color: red;">Erro no JS: ${error.message}</p>`;
+    });
 </script>
 </body>
 
