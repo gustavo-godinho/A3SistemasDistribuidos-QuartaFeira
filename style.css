@@ -1,7 +1,7 @@
 /* --- NOVAS Variáveis de Cores (Tema Escuro) e Estilos Globais --- */
 :root {
-    --primary-color: #279eff; /* Azul vibrante (mantido como destaque) */
-    --secondary-color: #248eff; /* Azul mais escuro para hover */
+    --primary-color: #ff89fb; /* Azul vibrante (mantido como destaque) */
+    --secondary-color: #d678ff; /* Azul mais escuro para hover */
     --background-dark: #000000; /* Cor de fundo principal */
     --background-medium: #000000; /* Cor de fundo para seções alternadas */
     --card-background: #1f1f1f; /* Cor de fundo dos cartões e formulários */
