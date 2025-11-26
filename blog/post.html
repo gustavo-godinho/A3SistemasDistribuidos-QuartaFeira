@@ -74,105 +74,116 @@
         </div>
     </footer>
 
-    <script>
-       
-        const BACKEND_URL = 'https://tomasa-pyrogallic-tiesha.ngrok-free.dev';
+   <script>
+    const postArea = document.getElementById('post-content-area');
+    const debugMsg = document.getElementById('debug-msg');
+    const params = new URLSearchParams(window.location.search);
+    const postSlug = params.get('slug');
 
-        const postArea = document.getElementById('post-content-area');
-        const debugMsg = document.getElementById('debug-msg');
-        const params = new URLSearchParams(window.location.search);
-        const postSlug = params.get('slug');
+    const BACKEND_URL = 'https://tomasa-pyrogallic-tiesha.ngrok-free.dev'; 
+  
 
-        function showDebug(msg) {
-            console.log(msg);
-            if(debugMsg) debugMsg.innerText = msg;
-        }
+    function showDebug(msg) {
+        console.log(msg);
+        if(debugMsg) debugMsg.innerText = msg;
+    }
 
-        // Função segura para converter blocos de texto
-        function convertContentToHtml(contentBlocks) {
-            if (!Array.isArray(contentBlocks)) return '<p>Sem conteúdo.</p>';
-            
-            let html = '';
-            contentBlocks.forEach(block => {
-                // Proteção contra blocos vazios
-                if (!block.children) return;
+    // Função Blindada para achar a imagem no Strapi v4 ou v5
+    function getStrapiImageURL(imageField) {
+        if (!imageField) return null;
 
-                const text = block.children.map(c => c.text || '').join('');
-                
-                if (block.type === 'paragraph') {
-                    // Só adiciona se tiver texto
-                    if(text.trim()) html += `<p>${text}</p>`;
-                } else if (block.type === 'heading') {
-                    const level = block.level || 2;
-                    html += `<h${level}>${text}</h${level}>`;
-                } else if (block.type === 'list') {
-                    const listType = block.format === 'ordered' ? 'ol' : 'ul';
-                    const listItems = block.children.map(item => {
-                        const itemText = item.children ? item.children.map(c => c.text).join('') : '';
-                        return `<li>${itemText}</li>`;
-                    }).join('');
-                    html += `<${listType}>${listItems}</${listType}>`;
+        let url = null;
+
+        // Tenta achar a URL em vários lugares possíveis da estrutura do Strapi
+        if (typeof imageField === 'string') {
+            url = imageField;
+        } else if (imageField.url) {
+            url = imageField.url;
+        } else if (imageField.data) {
+            // Se for array (várias imagens), pega a primeira
+            const imgData = Array.isArray(imageField.data) ? imageField.data[0] : imageField.data;
+            if (imgData) {
+                if (imgData.attributes && imgData.attributes.url) {
+                    url = imgData.attributes.url;
+                } else if (imgData.url) {
+                    url = imgData.url;
                 }
-            });
-            return html;
-        }
-
-        // Validação inicial
-        if (!postSlug) {
-            postArea.innerHTML = '<h1 style="color: white; text-align: center;">Link inválido (falta o slug).</h1>';
-            throw new Error("Slug não encontrado na URL");
-        }
-
-        const apiUrl = `${BACKEND_URL}/api/posts?filters[slug][$eq]=${postSlug}&populate=*`;
-        showDebug("A conectar ao servidor...");
-
-        // Fetch com Bypass do Ngrok e Verificação de JSON
-        fetch(apiUrl, {
-            method: 'GET',
-            headers: {
-                "ngrok-skip-browser-warning": "true"
             }
+        }
+
+        // Se achou a URL, verifica se precisa do domínio antes
+        if (url) {
+            // Se a url já começar com http, retorna ela mesma (ex: imagem externa)
+            if (url.startsWith('http')) return url;
+            // Se não, cola o Ngrok na frente
+            return `${BACKEND_URL}${url}`;
+        }
+        return null;
+    }
+
+    // Função segura para converter texto
+    function convertContentToHtml(contentBlocks) {
+        if (!Array.isArray(contentBlocks)) return '<p>Sem conteúdo.</p>';
+        let html = '';
+        contentBlocks.forEach(block => {
+            if (!block.children) return;
+            const text = block.children.map(c => c.text || '').join('');
+            
+            if (block.type === 'paragraph') {
+                if(text.trim()) html += `<p>${text}</p>`;
+            } else if (block.type === 'heading') {
+                const level = block.level || 2;
+                html += `<h${level}>${text}</h${level}>`;
+            } else if (block.type === 'list') {
+                const tag = block.format === 'ordered' ? 'ol' : 'ul';
+                const items = block.children.map(item => `<li>${item.children[0]?.text || ''}</li>`).join('');
+                html += `<${tag}>${items}</${tag}>`;
+            }
+        });
+        return html;
+    }
+
+    // Execução Principal
+    if (!postSlug) {
+        postArea.innerHTML = '<h1 style="color: white; text-align: center;">Link inválido.</h1>';
+    } else {
+        const apiUrl = `${BACKEND_URL}/api/posts?filters[slug][$eq]=${postSlug}&populate=*`;
+        
+        // Fetch com cabeçalho para pular o aviso do Ngrok
+        fetch(apiUrl, {
+            headers: { "ngrok-skip-browser-warning": "true" }
         })
         .then(res => {
             if(!res.ok) throw new Error(`Erro HTTP: ${res.status}`);
-            
-        
-            const contentType = res.headers.get("content-type");
-            if (contentType && contentType.indexOf("application/json") !== -1) {
-                return res.json();
-            } else {
-    
-                return res.text().then(text => {
-                    throw new Error("O servidor respondeu com HTML (provável aviso do Ngrok). Verifique o CORS no backend.");
-                });
-            }
+            return res.json();
         })
         .then(data => {
-            showDebug("Dados recebidos. A processar...");
-
             if (!data.data || data.data.length === 0) {
-                postArea.innerHTML = '<h1 style="color: white; text-align: center;">Post não encontrado no sistema.</h1>';
+                postArea.innerHTML = '<h1 style="color: white; text-align: center;">Post não encontrado.</h1>';
                 return;
             }
 
-            // Padrão Strapi v5
+            // Pega o primeiro post encontrado
             const post = data.data[0]; 
+            const attributes = post.attributes || post; // Compatibilidade v4/v5
+
+            document.title = (attributes.seo_title || attributes.title) + " - Blog";
             
-            document.title = (post.seo_title || post.title) + " - Blog";
+            // --- AQUI USAMOS A FUNÇÃO NOVA ---
+            const fullImageUrl = getStrapiImageURL(attributes.cover_image);
             
-            // Lógica da Imagem
             let imgHTML = '';
-            const relativePath = post.cover_image?.url;
-            if (relativePath) {
-                imgHTML = `<img class="post-main-image" src="${BACKEND_URL}${relativePath}" alt="${post.title}">`;
+            if (fullImageUrl) {
+                console.log("Imagem encontrada:", fullImageUrl); // Veja isso no F12 se der erro
+                imgHTML = `<img class="post-main-image" src="${fullImageUrl}" alt="${attributes.title}">`;
+            } else {
+                console.log("Nenhuma imagem encontrada no objeto:", attributes.cover_image);
             }
             
-            // Conversão do Texto
-            const contentHtml = convertContentToHtml(post.content);
+            const contentHtml = convertContentToHtml(attributes.content);
 
-            // Renderização Final
             postArea.innerHTML = `
-                <h1>${post.title}</h1>
+                <h1>${attributes.title}</h1>
                 ${imgHTML}
                 <div class="post-body">
                     ${contentHtml}
@@ -180,17 +191,10 @@
             `;
         })
         .catch(error => {
-            console.error('Erro grave:', error);
-            postArea.innerHTML = `
-                <div style="text-align: center; color: #ff6b6b;">
-                    <h1>Ops! Ocorreu um erro.</h1>
-                    <p>Detalhes: ${error.message}</p>
-                    <p style="font-size: 0.9rem; margin-top: 10px;">
-                        Dica: Se o erro for de HTML/Ngrok, tente o botão 'Visit Site' manualmente ou verifique o CORS no backend.
-                    </p>
-                </div>
-            `;
+            console.error('Erro:', error);
+            postArea.innerHTML = `<p style="color: red; text-align: center;">Erro: ${error.message}</p>`;
         });
-    </script>
+    }
+</script>
 </body>
 </html>
