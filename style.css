@@ -1,25 +1,27 @@
-/* --- NOVAS Variáveis de Cores (Tema Escuro) e Estilos Globais --- */
+/* --- 🎨 Variáveis de Cores e Estilos Globais --- */
 :root {
-    --primary-color: #ff89fb; /* Azul vibrante (mantido como destaque) */
-    --secondary-color: #d678ff; /* Azul mais escuro para hover */
-    --background-dark: #000000; /* Cor de fundo principal */
-    --background-medium: #000000; /* Cor de fundo para seções alternadas */
-    --card-background: #1f1f1f; /* Cor de fundo dos cartões e formulários */
-    --text-primary: #f0f0f0; /* Cor principal do texto (branco suave) */
-    --text-secondary: #ffffff; /* Cor para texto secundário */
-    --font-heading: 'Montserrat', sans-serif;
-    --font-body: 'Roboto', sans-serif;
+    --primary-color: #ff89fb; /* Roxo vibrante/Magenta (Cor de destaque) */
+    --secondary-color: #d678ff; /* Roxo mais escuro para hover/foco */
+    --background-dark: #000000; /* Cor de fundo principal (Preto) */
+    --background-medium: #000000; /* Cor de fundo para seções alternadas (Preto) */
+    --card-background: #1f1f1f; /* Cor de fundo dos cartões (Blog, Sidebar) */
+    --text-primary: #f0f0f0; /* Cor principal do texto (Branco suave) */
+    --text-secondary: #ffffff; /* Cor para texto secundário (Branco puro) */
+    --font-heading: 'Montserrat', sans-serif; /* Fonte para títulos */
+    --font-body: 'Roboto', sans-serif; /* Fonte para o corpo do texto */
 }
 
+/* Reset básico para todos os elementos. */
 * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
+    box-sizing: border-box; /* Garante que padding e borda não aumentem o tamanho do elemento. */
 }
 
+/* Configurações da página. */
 html, body {
-    scroll-behavior: smooth;
-    overflow-x: hidden;
+    scroll-behavior: smooth; /* Rolagem suave ao clicar em links internos. */
+    overflow-x: hidden; /* Evita barras de rolagem horizontais indesejadas. */
 }
 
 body {
@@ -29,18 +31,21 @@ body {
     background-color: var(--background-dark);
 }
 
+/* Classe de largura máxima e centralização comum a todas as seções. */
 .container {
     max-width: 1100px;
     margin: 0 auto;
     padding: 0 20px;
 }
 
+/* Estilos de títulos. */
 h1, h2, h3 {
     font-family: var(--font-heading);
     font-weight: 600;
     color: var(--text-primary);
 }
 
+/* Estilo padrão para H2 (usado em Services, Blog List, CTA Final). */
 h2 {
     text-align: center;
     margin-bottom: 40px;
@@ -49,6 +54,7 @@ h2 {
     padding-bottom: 10px;
 }
 
+/* Linha de destaque abaixo do H2. */
 h2::after {
     content: '';
     position: absolute;
@@ -60,30 +66,31 @@ h2::after {
     background-color: var(--primary-color);
 }
 
+/* Padding padrão para todas as seções. */
 section {
     padding: 80px 0;
 }
 
-/* --- Cabeçalho e Navegação --- */
+/* --- ⬆️ Cabeçalho e Navegação Principal --- */
 header {
-    position: fixed;
+    position: fixed; /* Fixa o header no topo da tela. */
     width: 100%;
     top: 0;
     z-index: 1000;
-    transition: transform 0.4s ease-in-out;
-}
-
-.header-wrapper {
+    transition: transform 0.4s ease-in-out; /* Transição para o efeito de esconder/mostrar. */
+    
+    /* Estilos do cabeçalho que foi removido do HTML anterior, mas é útil aqui: */
     background-color: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px); /* Efeito de desfoque no fundo do header. */
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        transform: translateZ(0);
 }
 
+/* Classe adicionada via JavaScript para esconder o header ao rolar para baixo. */
 .header-hidden {
     transform: translateY(-100%) !important;
 }
 
+/* Layout do conteúdo dentro do container do header. */
 header .container {
     display: flex;
     justify-content: space-between;
@@ -115,18 +122,19 @@ nav ul li a:hover {
     color: var(--primary-color);
 }
 
-/* --- Seção Hero --- */
+/* --- 🌟 Seção Hero (Home Page) --- */
 .hero {
     position: relative;
     height: 100vh;
     min-height: 700px;
-    display: flex; /* Adicionado para centralização vertical */
-    align-items: center;
+    display: flex; 
+    align-items: center; /* Centraliza verticalmente o conteúdo. */
     overflow: hidden;
+    /* Imagem de fundo e sobreposições (Gradientes para escurecer a imagem). */
     background:
         linear-gradient(to right, rgb(0, 0, 0) 0%, rgba(0, 0, 0, 0.89) 50%, rgba(0, 0, 0, 0.479) 100%),
         linear-gradient(to top, var(--background-dark) 5%, transparent 40%),
-        url('image/dicas-para-quem-está-indo-para-a-faculdade.jpeg') no-repeat center center/cover;
+        url('image/dicas-para-quem-está-indo-para-a-faculdade.jpeg') no-repeat center center/cover;
 }
 
 .hero .container {
@@ -152,34 +160,7 @@ nav ul li a:hover {
     max-width: 500px;
 }
 
-.hero-socials {
-    display: flex;
-    gap: 25px;
-    margin-top: 40px;
-}
-
-.hero-socials a {
-    color: var(--text-primary);
-    font-size: 1.6rem;
-    transition: transform 0.3s ease, color 0.3s ease;
-}
-
-.hero-socials a:hover {
-    color: var(--primary-color);
-    transform: scale(1.2);
-}
-
-@keyframes fadeInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-50px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
+/* --- 🤙 Botão de Chamado à Ação (CTA) --- */
 .cta-button {
     background-color: var(--primary-color);
     color: #ffffff;
@@ -196,16 +177,17 @@ nav ul li a:hover {
 
 .cta-button:hover {
     background-color: var(--secondary-color);
-    transform: translateY(-3px);
+    transform: translateY(-3px); /* Efeito de elevação sutil. */
 }
 
-/* --- Seção de Serviços --- */
+/* --- 📚 Seção de Serviços/Cursos (Home Page) --- */
 .services {
     background-color: var(--background-medium);
 }
 
 .services-grid {
     display: grid;
+    /* Cria 4 colunas em telas grandes e ajusta automaticamente em telas menores. */
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 30px;
 }
@@ -228,7 +210,7 @@ nav ul li a:hover {
 }
 
 .service-card:hover {
-    transform: translateY(-10px);
+    transform: translateY(-10px); /* Efeito de elevação do card. */
     border-color: var(--primary-color);
 }
 
@@ -243,71 +225,12 @@ nav ul li a:hover {
     margin-bottom: 10px;
 }
 
-/* --- Seção de Parceiros --- */
-.partners-section {
-    padding: 30px 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.partners-container {
-    display: flex;
-    align-items: center;
-    gap: 40px;
-}
-
-.partners-title {
-    flex-basis: 25%;
-    text-align: right;
-    color: var(--text-secondary);
-}
-
-.partners-title h3 {
-    font-size: 1.3rem;
-    font-weight: 500;
-}
-
-.logo-scroller {
-    flex: 1;
-    overflow: hidden;
-    position: relative;
-    -webkit-mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
-    mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
-    min-width: 0;
-}
-
-.logo-track {
-    --scroll-speed: 30s;
-    display: flex;
-    gap: 50px;
-    width: max-content;
-    animation: scrollLogos var(--scroll-speed) linear infinite;
-}
-
-.logo-item {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.logo-item img {
-    height: 100px;
-    max-width: 150px;
-    border-radius: 10px;
-}
-
-@keyframes scrollLogos {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
-}
-
-/* --- Seções de Detalhe do Serviço --- */
+/* --- 📝 Seções de Detalhe do Serviço (Home Page) --- */
 .service-detail {
     padding: 100px 0;
 }
 .service-detail.alt-bg {
-    background-color: var(--background-medium);
+    background-color: var(--background-medium); /* Fundo para seções alternadas. */
 }
 .detail-content {
     display: flex;
@@ -317,14 +240,16 @@ nav ul li a:hover {
 .detail-text, .detail-image {
     flex: 1;
 }
+/* Inverte a ordem das colunas (texto à direita, imagem à esquerda). */
 .layout-reverse {
     flex-direction: row-reverse;
 }
 .detail-text h2 {
-    text-align: left;
+    text-align: left; /* Alinhamento do H2 nos detalhes. */
     font-size: 2.2rem;
     margin-bottom: 15px;
 }
+/* Remove a linha de destaque dos H2 nesta seção. */
 .detail-text h2::after {
     display: none;
 }
@@ -355,7 +280,7 @@ nav ul li a:hover {
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
-/* --- Estilos do Blog --- */
+/* --- 📰 Estilos do Blog (Página de Lista - blog/index.html) --- */
 .blog-list-section {
     padding: 80px 0;
     background-color: var(--background-medium);
@@ -373,6 +298,7 @@ nav ul li a:hover {
 }
 .posts-grid {
     display: grid;
+    /* Grid de posts. */
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 30px;
 }
@@ -380,465 +306,4 @@ nav ul li a:hover {
     background-color: var(--card-background);
     border-radius: 8px;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    text-decoration: none;
-}
-.post-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-}
-.post-card-image {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    display: block;
-}
-.post-card-content {
-    padding: 25px;
-
-}
-.post-card-content h3 {
-    font-size: 1.4rem;
-    margin-bottom: 15px;
-}
-.post-card-content h3 a {
- text-decoration: none !important; /* Remove o sublinhado */
-    color: var(--text-primary) !important; /* Força a cor padrão */
-    transition: color 0.3s ease;
-}
-.post-card-content h3 a:hover {
-  color: var(--primary-color) !important; /* Fica azul no hover */
-}
-.post-card-content p {
-    color: var(--text-secondary);
-    line-height: 1.6;
-    margin-bottom: 20px;
-}
-.read-more-btn {
-    text-decoration: none;
-    color: var(--primary-color);
-    font-weight: 600;
-    transition: padding-left 0.3s ease;
-}
-.read-more-btn:hover {
-    padding-left: 5px;
-}
-.post-section {
-    padding: 80px 0;
-    background-color: var(--background-dark);
-}
-.post-section .container {
-    max-width: 1100px;
-    margin: 0 auto;
-}
-.post-section h1 {
-    font-size: 2.8rem;
-    line-height: 1.3;
-    color: var(--text-primary);
-}
-.post-main-image {
-    width: 100%;
-    height: auto;
-    border-radius: 8px;
-    margin: 30px 0 40px;
-}
-.post-body {
-    color: var(--text-secondary);
-    font-size: 1.1rem;
-    line-height: 1.8;
-}
-.post-body h2 {
-    font-size: 1.8rem;
-    margin: 40px 0 20px;
-    color: var(--text-primary);
-}
-.post-body p {
-    margin-bottom: 20px;
-}
-.post-body a {
-    color: var(--primary-color);
-    text-decoration: underline;
-}
-.post-body ul, .post-body ol {
-    margin-bottom: 20px;
-    padding-left: 25px;
-}
-
-/* --- Barra Lateral do Blog --- */
-.post-layout {
-    display: flex;
-    align-items: flex-start;
-    gap: 50px;
-}
-.post-main-content {
-    flex: 2;
-    min-width: 0;
-}
-.post-sidebar {
-    flex: 1;
-    position: sticky;
-    top: 120px;
-}
-.sidebar-widget {
-    background-color: var(--card-background);
-    padding: 25px;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    margin-bottom: 30px;
-}
-.sidebar-widget h3 {
-    font-size: 1.3rem;
-    color: var(--text-primary);
-    margin-bottom: 15px;
-    border-bottom: 2px solid var(--primary-color);
-    padding-bottom: 10px;
-    display: inline-block;
-}
-.sidebar-widget p {
-    line-height: 1.7;
-    margin-bottom: 20px;
-}
-.sidebar-widget .cta-button {
-    width: 100%;
-}
-.sidebar-socials {
-    display: flex;
-    gap: 20px;
-}
-.sidebar-socials a {
-    color: var(--text-secondary);
-    font-size: 1.8rem;
-    transition: color 0.3s ease, transform 0.3s ease;
-}
-.sidebar-socials a:hover {
-    color: var(--primary-color);
-    transform: translateY(-3px);
-}
-
-/* --- Rodapé --- */
-.site-footer {
-    background-color: var(--background-dark);
-    color: var(--text-secondary);
-    padding: 60px 0 20px 0;
-    font-size: 0.95rem;
-}
-.footer-content {
-    display: flex;
-    justify-content: space-between;
-    gap: 40px;
-    padding-bottom: 40px;
-    margin-bottom: 30px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-.footer-column {
-    flex: 1;
-}
-.footer-about {
-    flex: 1.5;
-    padding-right: 20px;
-}
-.footer-column h3 {
-    font-size: 1.3rem;
-    color: var(--text-primary);
-    margin-bottom: 25px;
-    font-weight: 600;
-}
-.footer-logo {
-    font-family: var(--font-heading);
-    color: var(--primary-color);
-    font-weight: 700;
-}
-.footer-about p, .footer-links ul, .footer-contact p {
-    line-height: 1.7;
-}
-.footer-links ul {
-    list-style: none;
-    padding: 0;
-}
-.footer-links ul li {
-    margin-bottom: 12px;
-}
-.footer-links ul li a {
-    text-decoration: none;
-    color: var(--text-secondary);
-    transition: color 0.3s ease, padding-left 0.3s ease;
-}
-.footer-links ul li a:hover {
-    color: var(--primary-color);
-    padding-left: 5px;
-}
-.footer-contact p {
-    display: flex;
-    align-items: center;
-    margin-bottom: 15px;
-}
-.footer-contact p i {
-    margin-right: 15px;
-    width: 20px;
-    color: var(--primary-color);
-}
-.footer-bottom {
-    text-align: center;
-    font-size: 0.9rem;
-}
-.footer-bottom a {
-    color: var(--text-secondary);
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-.footer-bottom a:hover {
-    color: var(--primary-color);
-}
-
-/* --- Animações e Outros --- */
-.start-animation {
-    animation: fadeInDown 1.2s ease-out forwards;
-}
-.side-dot-nav {
-    position: fixed;
-    top: 50%;
-    right: 30px;
-    transform: translateY(-50%);
-    z-index: 1001;
-}
-.side-dot-nav ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-.side-dot-nav li {
-    height: 30px;
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-.side-dot-nav .dot {
-    display: block;
-    width: 12px;
-    height: 12px;
-    background-color: rgba(255, 255, 255, 0.5);
-    border-radius: 50%;
-    transition: transform 0.3s ease, background-color 0.3s ease;
-}
-.side-dot-nav .dot.active, .side-dot-nav .dot:hover {
-    background-color: var(--primary-color);
-    transform: scale(1.6);
-}
-.side-dot-nav .dot::before {
-    content: attr(data-tooltip);
-    position: absolute;
-    right: 25px;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: var(--primary-color);
-    color: #fff;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-.side-dot-nav .dot:hover::before {
-    opacity: 1;
-    visibility: visible;
-}
-
-/* --- CTA Final --- */
-.cta-final {
-    padding: 80px 0;
-    text-align: center;
-}
-.cta-final h2 {
-    font-size: 2.5rem;
-    color: var(--text-primary);
-    margin-bottom: 20px;
-}
-.cta-final h2::after {
-    content: '';
-    display: block;
-    margin: 15px auto 0;
-    width: 60px;
-    height: 4px;
-    background-color: var(--primary-color);
-}
-.cta-final p {
-    max-width: 600px;
-    margin: 0 auto 40px;
-    font-size: 1.1rem;
-    line-height: 1.7;
-}
-.cta-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-.cta-button.whatsapp-button {
-    background-color: #25D366;
-}
-.cta-button.whatsapp-button:hover {
-    background-color: #1DAA53;
-}
-.cta-button.instagram-button {
-    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-}
-.cta-button.instagram-button:hover {
-    filter: brightness(1.15);
-}
-
-/* --- Padding Dinâmico --- */
-main {
-    transition: padding-top 0.4s ease-in-out;
-}
-.header-visible-padding > section:first-of-type {
-    padding-top: 90px;
-}
-
-/* ====================================================== */
-/* CÓDIGO DE RESPONSIVIDADE UNIFICADO E CORRIGIDO       */
-/* ====================================================== */
-
-@media (max-width: 992px) {
-    .side-dot-nav {
-        display: none;
-    }
-    .hero-content {
-        max-width: 80%;
-    }
-    .hero-content h1 {
-        font-size: 3rem;
-    }
-    .post-layout {
-        flex-direction: column;
-    }
-    .post-sidebar {
-        position: static;
-        width: 100%;
-        margin-top: 60px;
-    }
-}
-
-@media (max-width: 768px) {
-    h2 {
-        font-size: 2rem;
-    }
-    header .container {
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-        align-items: center;
-        padding: 15px 0;
-    }
-    header #logo {
-        margin-bottom: 10px;
-    }
-    header nav ul {
-        flex-wrap: wrap;
-        justify-content: center;
-        padding-left: 0;
-    }
-    header nav ul li a {
-        padding: 8px 10px;
-    }
-    .hero-content {
-        max-width: 100%;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    .hero-content p {
-        max-width: 100%;
-    }
-    .hero-socials {
-        position: static;
-        flex-direction: row;
-        transform: none;
-        justify-content: center;
-    }
-    .partners-container {
-        flex-direction: column;
-        gap: 20px;
-    }
-    .partners-title {
-        text-align: center;
-        margin-bottom: 10px;
-        flex-basis: auto;
-    }
-    .logo-scroller {
-        width: 100%;
-    }
-    .detail-content, .layout-reverse {
-        flex-direction: column;
-        text-align: center;
-    }
-    .detail-text h2 {
-        text-align: center;
-    }
-    .detail-image {
-        margin-top: 30px;
-    }
-    .cta-buttons {
-        flex-direction: column;
-        align-items: center;
-    }
-    .cta-buttons .cta-button {
-        width: 100%;
-        max-width: 320px;
-    }
-    .footer-content {
-        flex-direction: column;
-        text-align: center;
-    }
-    .footer-column {
-        margin-bottom: 30px;
-    }
-    .footer-contact p {
-        justify-content: center;
-    }
-    .header-visible-padding > section:first-of-type {
-        padding-top: 140px;
-    }
-}
-
-@media (max-width: 576px) {
-    .hero-content h1 {
-        font-size: 2.2rem;
-    }
-}
-/* ====================================================== */
-/* ESTILO DO BOTÃO VOLTAR (BLOG)                        */
-/* ====================================================== */
-
-.btn-voltar {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px; /* Espaço entre a seta e o texto */
-    color: var(--text-secondary); /* Cor cinza/branca suave */
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 1rem;
-    margin-bottom: 30px; /* Espaço entre o botão e o título do post */
-    transition: all 0.3s ease;
-}
-
-.btn-voltar i {
-    font-size: 0.9rem;
-    transition: transform 0.3s ease;
-}
-
-/* Efeito ao passar o mouse */
-.btn-voltar:hover {
-    color: var(--primary-color); /* Fica azul */
-}
-
-.btn-voltar:hover i {
-    transform: translateX(-5px); /* A setinha move para a esquerda */
-}
+    border: 1px
