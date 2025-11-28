@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carregando post... - Blog Unisulistas</title>
     <link rel="stylesheet" href="../style.css">
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
@@ -34,16 +33,15 @@
         <section class="post-section">
             <div class="container post-layout">
                 <div class="post-main-content">
-                  
+                    
                     <div id="post-content-area">
                         <p style="color: white; text-align: center; margin-top: 50px;">
                             <i class="fas fa-spinner fa-spin"></i> A carregar conteúdo do post...
-                        </p>
+                            </p>
                         <p id="debug-msg" style="color: #aaa; text-align: center; font-size: 0.8rem;"></p>
-                    </div>
+                        </div>
                 </div>
 
-                <!-- Barra Lateral -->
                 <aside class="post-sidebar">
                     <div class="sidebar-widget">
                         <h3>Fale Conosco</h3>
@@ -51,9 +49,8 @@
                         <a href="#" class="cta-button whatsapp-button">
                             <i class="fab fa-whatsapp"></i> WhatsApp
                         </a>
-                        
                     </div>
-                      <a href="/blog/" class="btn-voltar">
+                    <a href="/blog/" class="btn-voltar">
                         <i class="fas fa-arrow-left"></i> Voltar
                     </a>
                 </aside>
@@ -69,22 +66,29 @@
         </div>
     </footer>
 
-   <script>
+    <script>
+    // Início da lógica JavaScript.
     const postArea = document.getElementById('post-content-area');
     const debugMsg = document.getElementById('debug-msg');
     const params = new URLSearchParams(window.location.search);
+    // Cria um objeto para ler os parâmetros da URL (ex: ?slug=titulo-do-post).
     const postSlug = params.get('slug');
+    // Pega o valor do parâmetro 'slug'.
 
-    const BACKEND_URL = 'https://tomasa-pyrogallic-tiesha.ngrok-free.dev'; 
-  
-
+    const BACKEND_URL = 'https://tomasa-pyrogallic-tiesha.ngrok-free.dev'; // Endereço da API.
+    
+    // Função para exibir mensagens no console e na tela (para depuração).
     function showDebug(msg) {
         console.log(msg);
         if(debugMsg) debugMsg.innerText = msg;
     }
 
-    // Função Blindada para achar a imagem no Strapi v4 ou v5
+    // Função Blindada para achar a imagem no Strapi v4 ou v5.
     function getStrapiImageURL(imageField) {
+        // Esta função tenta ler a URL da imagem de capa, independente da versão do Strapi,
+        // pois a estrutura do objeto pode variar (direta, dentro de 'data', dentro de 'attributes').
+        // Ela também adiciona o BACKEND_URL se for um caminho relativo (sem http://).
+
         if (!imageField) return null;
 
         let url = null;
@@ -95,7 +99,6 @@
         } else if (imageField.url) {
             url = imageField.url;
         } else if (imageField.data) {
-            // Se for array (várias imagens), pega a primeira
             const imgData = Array.isArray(imageField.data) ? imageField.data[0] : imageField.data;
             if (imgData) {
                 if (imgData.attributes && imgData.attributes.url) {
@@ -108,15 +111,13 @@
 
         // Se achou a URL, verifica se precisa do domínio antes
         if (url) {
-            // Se a url já começar com http, retorna ela mesma (ex: imagem externa)
             if (url.startsWith('http')) return url;
-            // Se não, cola o Ngrok na frente
             return `${BACKEND_URL}${url}`;
         }
         return null;
     }
 
-    // Função segura para converter texto
+    // Função segura para converter o formato rico do conteúdo do Strapi (parágrafos, títulos, listas) em HTML.
     function convertContentToHtml(contentBlocks) {
         if (!Array.isArray(contentBlocks)) return '<p>Sem conteúdo.</p>';
         let html = '';
@@ -124,6 +125,7 @@
             if (!block.children) return;
             const text = block.children.map(c => c.text || '').join('');
             
+            // Verifica o tipo do bloco e converte para a tag HTML correspondente.
             if (block.type === 'paragraph') {
                 if(text.trim()) html += `<p>${text}</p>`;
             } else if (block.type === 'heading') {
@@ -138,13 +140,15 @@
         return html;
     }
 
-    // Execução Principal
+    // Execução Principal (Onde a mágica acontece)
     if (!postSlug) {
+        // Se o slug não foi encontrado na URL, mostra erro.
         postArea.innerHTML = '<h1 style="color: white; text-align: center;">Link inválido.</h1>';
     } else {
+        // Monta a URL da API para buscar o post ESPECÍFICO pelo SLUG.
         const apiUrl = `${BACKEND_URL}/api/posts?filters[slug][$eq]=${postSlug}&populate=*`;
         
-        // Fetch com cabeçalho para pular o aviso do Ngrok
+        // Inicia a busca (fetch) do post.
         fetch(apiUrl, {
             headers: { "ngrok-skip-browser-warning": "true" }
         })
@@ -153,30 +157,34 @@
             return res.json();
         })
         .then(data => {
+            // Verifica se a API retornou o post.
             if (!data.data || data.data.length === 0) {
                 postArea.innerHTML = '<h1 style="color: white; text-align: center;">Post não encontrado.</h1>';
                 return;
             }
 
-            // Pega o primeiro post encontrado
+            // Pega o primeiro post encontrado (deve ser apenas um, já que busca pelo slug único).
             const post = data.data[0]; 
             const attributes = post.attributes || post; // Compatibilidade v4/v5
 
+            // Atualiza o título da aba do navegador.
             document.title = (attributes.seo_title || attributes.title) + " - Blog";
             
-            // --- AQUI USAMOS A FUNÇÃO NOVA ---
+            // Obtém a URL da imagem usando a função blindada.
             const fullImageUrl = getStrapiImageURL(attributes.cover_image);
             
             let imgHTML = '';
             if (fullImageUrl) {
-                console.log("Imagem encontrada:", fullImageUrl); // Veja isso no F12 se der erro
+                console.log("Imagem encontrada:", fullImageUrl); 
                 imgHTML = `<img class="post-main-image" src="${fullImageUrl}" alt="${attributes.title}">`;
             } else {
                 console.log("Nenhuma imagem encontrada no objeto:", attributes.cover_image);
             }
             
+            // Converte o conteúdo rico para HTML.
             const contentHtml = convertContentToHtml(attributes.content);
 
+            // Injeta todo o conteúdo (Título, Imagem e Corpo do texto) na DIV principal.
             postArea.innerHTML = `
                 <h1>${attributes.title}</h1>
                 ${imgHTML}
@@ -186,6 +194,7 @@
             `;
         })
         .catch(error => {
+            // Em caso de erro na requisição.
             console.error('Erro:', error);
             postArea.innerHTML = `<p style="color: red; text-align: center;">Erro: ${error.message}</p>`;
         });
