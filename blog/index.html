@@ -5,12 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blog - Unisulistas | Notícias e Eventos</title>
     <link rel="stylesheet" href="../style.css">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
+    </head>
 <body>
     <header>
         <div class="container">
@@ -31,7 +30,6 @@
             <div class="container">
                 <h2>Blog da Unisulistas</h2>
                 <p class="section-subtitle">Fique por dentro das últimas notícias, eventos e novidades da vida acadêmica.</p>
-
                 <div id="posts-container" class="posts-grid">
                     </div>
             </div>
@@ -42,54 +40,69 @@
         </footer>
     
 <script>
+    // Início da seção JavaScript, responsável por buscar os dados do blog.
     const postsContainer = document.getElementById('posts-container');
+    // Armazena a referência ao elemento DIV onde os posts serão exibidos.
     
     // SEU LINK NGROK ATUAL
     const BACKEND_URL = 'https://tomasa-pyrogallic-tiesha.ngrok-free.dev';
+    // Define a URL base do seu servidor/API (CMS Strapi, neste caso, usando Ngrok).
     
     const apiUrl = `${BACKEND_URL}/api/posts?populate=*&sort=createdAt:desc`;
+    // Monta a URL completa para buscar todos os posts, incluindo imagens/campos relacionados ('populate=*') e ordenando por criação mais recente.
 
-    // Função auxiliar para texto
+    // Função auxiliar para converter o conteúdo rico (formato Strapi) em texto simples para o resumo.
     function convertContentToText(contentBlocks) {
         if (!Array.isArray(contentBlocks)) return '';
+        // Verifica se é um array (garantia de segurança).
         return contentBlocks.map(block => 
+            // Mapeia cada bloco do conteúdo...
             block.children.map(child => child.text).join('')
-        ).join(' ');
+            // ...e junta o texto de todos os elementos filhos de cada bloco.
+        ).join(' '); // Junta todos os blocos com um espaço.
     }
 
     console.log("1. Iniciando busca em:", apiUrl);
+    // Log para rastrear o início da requisição no console do navegador.
 
     fetch(apiUrl, {
+        // Inicia a requisição assíncrona (AJAX) para a API.
         method: 'GET',
         headers: {
             "Content-Type": "application/json",
             "ngrok-skip-browser-warning": "true"
+            // Header especial para ignorar o aviso de segurança do Ngrok no navegador.
         }
     })
     .then(res => {
         console.log("2. Status da resposta:", res.status);
+        // Log do status (ex: 200 OK)
         return res.json();
+        // Converte a resposta recebida (string) para um objeto JavaScript (JSON).
     })
     .then(data => {
         console.log("3. DADOS RECEBIDOS (Abra aqui para ver):", data); // <--- OLHE ISSO NO CONSOLE
 
-        // Verifica se data.data existe e se tem itens
+        // Verifica se data.data existe e se tem itens (Formato de resposta comum do Strapi).
         if (!data.data || data.data.length === 0) {
             postsContainer.innerHTML = '<p style="color: white; text-align: center;">A API respondeu, mas a lista de posts está vazia. (Verifique se publicou o post no Strapi)</p>';
+            // Mensagem de erro se a API responder, mas a lista de posts estiver vazia.
             return;
         }
 
         data.data.forEach(post => {
+            // Itera sobre cada item de postagem recebido.
             const card = document.createElement('div');
+            // Cria um novo elemento DIV que será o card do post.
             card.className = 'post-card';
             
-            // TENTATIVA DE LEITURA HÍBRIDA (Para funcionar em v4 e v5)
-            // Se post.attributes existir (v4), usa ele. Se não, usa o próprio post (v5).
+            // TENTATIVA DE LEITURA HÍBRIDA (Para funcionar em v4 e v5 do Strapi, por exemplo)
             const attributes = post.attributes ? post.attributes : post;
+            // Verifica se os dados do post estão dentro de 'attributes' (v4) ou na raiz (v5) e armazena.
             const id = post.id; // O ID costuma estar na raiz
-            const slug = attributes.slug; // O slug pode estar na raiz ou em attributes
+            const slug = attributes.slug; // Pega o slug para criar o link do post.
 
-            // Imagem
+            // Lógica para obter a URL da imagem de capa, lidando com diferentes estruturas.
             let imgUrl = null;
             if (attributes.cover_image && attributes.cover_image.url) {
                 imgUrl = attributes.cover_image.url; // v5 direto
@@ -98,12 +111,15 @@
             }
 
             const textContent = convertContentToText(attributes.content);
+            // Converte o conteúdo para texto simples.
             const excerpt = textContent.substring(0, 120) + '...';
+            // Cria um resumo (excerto) de 120 caracteres.
 
+            // Monta o HTML do card de postagem.
             card.innerHTML = `
                 <a href="post.html?slug=${slug}" class="post-card-link">
                     ${imgUrl ? `<img class="post-card-image" src="${BACKEND_URL}${imgUrl}" alt="${attributes.title}">` : ''}
-                </a>
+                    </a>
                 <div class="post-card-content">
                     <h3><a href="post.html?slug=${slug}">${attributes.title}</a></h3>
                     <p>${excerpt}</p>
@@ -111,18 +127,16 @@
                 </div>
             `;
             postsContainer.appendChild(card);
+            // Adiciona o card totalmente montado dentro do 'posts-container' (a DIV vazia).
         });
     })
     .catch(error => {
+        // Bloco executado se a requisição falhar completamente (ex: problema de rede, CORS, API fora do ar).
         console.error('ERRO FATAL:', error);
         postsContainer.innerHTML = `<p style="color: red;">Erro no JS: ${error.message}</p>`;
+        // Exibe uma mensagem de erro na tela.
     });
 </script>
 </body>
 
 </html>
-
-
-
-
-
